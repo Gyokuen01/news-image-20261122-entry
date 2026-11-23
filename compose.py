@@ -2,11 +2,11 @@
 """THE WORLD TODAY front page, Sunday 22 November 2026 (v3).
 
 This program paints a 1024x1024 newspaper front page and writes it to
-entry.png: a masthead, a navy date band, a six-cell statistics strip, a
-hero lead about COP31 and the Bahrain strike with three small portraits,
-three feature boxes, and a numbered digest of 36 stories from 22 November
-2026 sorted into 9 regions, closed by a DATE CHECK box that states every
-story on the page is dated that day.
+entry.png: a masthead, a navy date band, a one-line statistics strip, a
+hero lead about the COP31 collapse in Antalya and the Benghazi drone
+strike, three feature boxes, and a numbered digest of 57 stories from
+22 November 2026 sorted into 9 regions, closed by a DATE CHECK box
+that states every story on the page is dated that day.
 
 Only Pillow is used. The picture is fully deterministic: the program reads
 no clock, no random source and no network, so two runs write the same
@@ -73,84 +73,101 @@ def plain(size):
 
 # ------------------------------------------------------------------ content
 # (number, headline, detail) per region, grouped into three columns.
+# 57 stories, all dated Sunday 22 November 2026. Headlines stay under
+# 40 characters and details under 55 so each story fits one line each
+# at the digest type sizes (bold 11 / plain 9 across 287 px).
 STORY_COLUMNS = [
     [
         ("CLIMATE", [
-            (1, "COP31 nears a final deal", "Antalya package put to nations; vote 06:00 GMT"),
-            (2, "Draft drops fossil-fuel phase-out", "130 nations pushed for it; producers resisted"),
+            (1, "COP31 collapses in Antalya", "No deal after fossil-fuel fight; first since 2009"),
+            (2, "COP31 negotiator 'very disappointed'", "Chris Bowen rues the collapse of the Antalya talks"),
+            (3, "India flags lack of equity", "Developing bloc decries diluted climate responsibility"),
         ]),
-        ("THE GULF", [
-            (3, "Iran hits Bahrain: site ablaze", "IRGC missiles, drones strike; fire, no injuries"),
-            (4, "Bahrain defences intercept attacks", "Shrapnel causes damage; no casualties reported"),
-            (5, "Houthi missile at Saudi Arabia", "Saudi coalition says it was intercepted"),
-            (6, "Trump: Iran deal 'could last 20 years'", "US president floats a long-term agreement"),
-            (7, "Iran internet bill targets privacy", "Accounts to be tied to real identities"),
+        ("RUSSIA-UKRAINE", [
+            (4, "Sea drones hit Russian warship", "Ship capsizes at Benghazi naval base, satellites show"),
+            (5, "Russian strike kills 3 near Kyiv", "Apartment block in Dymer hit; up to 7 feared trapped"),
+            (6, "Woman pulled alive after 22 hours", "Rescued from rubble after night strike near Kyiv"),
+            (7, "Missiles hit Zelenskyy's hometown", "Ballistic attack on Kryvyi Rih kills 2, wounds scores"),
+            (8, "Russian missiles land in Poland", "NATO calls it a violation as drills run nearby"),
+            (9, "Poland: Russia tried to kill rapper", "Moscow allegedly targeted a Ukrainian American"),
+            (10, "Russia grasps US security offer", "Moscow revives old demands on European security"),
+            (11, "Drone hits Russian ship off Finland", "Attack in the Baltic Sea as tensions stay high"),
         ]),
-        ("ISRAEL & GAZA", [
-            (8, "Eisenkot tasked to form government", "Herzog picks ex-army chief over Netanyahu"),
-            (9, "Eisenkot open to Netanyahu joining", "Likud invited to coalition talks on Sunday"),
-            (10, "Likud sets unity-govt conditions", "Keep security zones; no Palestinian state"),
-            (11, "Gaza aid plea from four nations", "150,000 tents stuck at the border, floods bite"),
-            (12, "Turkey intel chief meets Hamas", "Talks in Istanbul as Gaza ceasefire holds"),
+        ("MIDDLE EAST", [
+            (12, "Two tankers hit mines off Hormuz", "Bahrain reports attack on Sitra plant; 2 injured"),
+            (13, "Iran vows to counter US blockade", "IRGC Navy warns ships to coordinate with Tehran"),
+            (14, "Eisenkot: settler attacks 'terrorism'", "Settlers hit four villages, torch vehicles"),
+            (15, "Israeli strikes kill 5 in Gaza", "Two killed by forces; three die in a vehicle strike"),
+            (16, "ICJ: Myanmar committed genocide", "Court rules over the Rohingya in landmark case"),
+            (17, "Rohingya welcome verdict, want home", "Refugees in Bangladesh hail ruling, seek return"),
+            (18, "Houthis strike Saudi Arabia", "Coalition intercepts a Houthi missile"),
+            (19, "US sanctions Iran oil 'trustees'", "Treasury targets collectors of oil revenues"),
         ]),
     ],
     [
-        ("UKRAINE WAR", [
-            (13, "Sparta II hit by drones in Baltic", "Russian ship ablaze, drifts into Finnish waters"),
-            (14, "Russian helicopter 'breaches' Finland", "Airspace violated near Loviisa; NATO told"),
-            (15, "Russia strikes Kryvyi Rih", "Missiles hit Zelenskyy's hometown again"),
-            (16, "Kindergarten hit in Zaporizhzhya", "Russian forces strike the region, Kyiv says"),
-            (17, "Melania Trump seeks more ceasefires", "Wants Russia-Ukraine truces before Christmas"),
+        ("NORTH AMERICA", [
+            (20, "Democrats clinch 258 House seats", "Largest majority since 1992; Hubbard wins recount"),
+            (21, "Trump backs 10% card-rate cap", "President says he will work with Democrats on cap"),
+            (22, "Trump orders contractors in line", "Congressional requests to go via White House"),
+            (23, "FBI probes crime-database hack", "Reported breach of the National Crime Info Center"),
+            (24, "Top court rejects Trump UC appeal", "Research-grant cuts stand after Supreme Court no"),
+            (25, "First US deep-sea mining leases", "Auctions near American Samoa; $3M minimum each"),
+            (26, "Senate rejects Iran war powers", "Three Republicans join Democrats in the vote"),
+            (27, "Musk: 'pretty foolish' on $500M", "Musk rues spending nearly $500M on the GOP"),
+            (28, "Stocks slide as AI sell-off deepens", "S&P and Dow in correction; Nasdaq falls 5.28%"),
+            (29, "Nvidia chip scandal widens", "US confirms China got AI chips; SEC probe opens"),
         ]),
         ("EUROPE", [
-            (18, "France: 4th weekend of protests", "Cost-of-living marches across the country"),
-            (19, "Lisbon: thousands march on prices", "Portugal protest over inflation and rents"),
-            (20, "EU hunts new ECB chief", "Search opens as Christine Lagarde resigns"),
-            (21, "Blair: rejoin EU only if UK innovates", "Ex-PM sets a technology test for return"),
-        ]),
-        ("WASHINGTON & THE UN", [
-            (22, "US details $12bn Venezuela revenue", "State Dept report on oil and mineral income"),
-            (23, "Hegseth memo limits US-Canada ties", "Secret memo curbs defence cooperation"),
-            (24, "Killer-robot talks run to 2028 deal", "UN states agree to keep negotiating the ban"),
+            (30, "EU signs Indonesia trade deal", "Ten years of talks end; 98.5% of tariffs axed"),
+            (31, "EU confirms data leak after hack", "Commission hit by cyberattack; personal data out"),
+            (32, "450 German schools get bomb threats", "Threat emails spark probe across the country"),
+            (33, "Macron proposes budget 'golden rule'", "French president pitches a new fiscal anchor"),
+            (34, "Sanchez ups ante before snap poll", "Spain votes 29 November as pressure builds"),
+            (35, "Manchester concert evacuated", "Gas scare hits Don Toliver gig; 12,000 affected"),
+            (36, "Czech police detain fund executive", "Turkish executive wanted in a fund probe held"),
+            (37, "Hungary PM to visit Transcarpathia", "Pledges support to locals across the border"),
+            (38, "Turkey seeks EU car-tariff waiver", "Ankara wants exemption from hybrid-car duties"),
         ]),
     ],
     [
+        ("ASIA", [
+            (39, "Indonesia names 6 in treason plot", "Police officials among suspects, officials say"),
+            (40, "Candy factory fire: 34 missing", "Three killed, four hurt; more remains found"),
+            (41, "Thai court upholds royal conviction", "Opposition MP's sentence cut to three years"),
+            (42, "India pledges EUR 1.4bn to Nepal", "Rebuild aid after a deadly glacier flood"),
+            (43, "Nepal PM starts two-day India visit", "Eight MoUs signed, from space to security"),
+            (44, "China eases margin trading rules", "Minimum ratio cut to 80% from 100% on 30 Nov"),
+            (45, "China chipmakers gain ground", "CXMT and YMTC advance amid US export curbs"),
+            (46, "Taiwan cautions Canada on China", "Taipei warns over closer economic ties"),
+            (47, "North Korea leader cites security", "Kim highlights defence after Trump no-show"),
+            (48, "Mongolia heads for snap vote", "Presidential ballot after president resigns"),
+        ]),
         ("AFRICA", [
-            (25, "Al-Shabaab claims ambush killings", "Group says hundreds of Somali troops dead"),
-            (26, "Kenya's last Ebola patient out", "Kenya's last case out; DRC toll passes 5,300"),
-            (27, "Ghana unveils Heritage banknotes", "Nkrumah and Kofi Annan honoured on cash"),
-            (28, "Tigray's new mayor vows a vote", "Elections promised in six months after clashes"),
+            (49, "Nigeria boat capsizes; 24 dead", "Vessel carrying funeral mourners sinks"),
+            (50, "Kenya enforces crypto licensing", "Central bank starts VASP framework for assets"),
+            (51, "Nigeria seizes 50.4kg of cannabis", "Golfer and chef arrested in NDLEA swoop"),
+            (52, "Drone strikes destroy Khartoum homes", "Rebels kill 15 civilians in South Sudan"),
         ]),
-        ("AFRICA & ASIA", [
-            (29, "Sahel states reopen West Africa talks", "Dialogue restarts with the regional bloc"),
-            (30, "DRC leader signs reform law", "Constitutional change amid high tensions"),
-            (31, "Nigeria starts building naval ships", "Bid to cut reliance on foreign yards"),
-            (32, "India-Canada end trade talks round", "Sixth round of CEPA negotiations closes"),
+        ("LATIN AMERICA", [
+            (53, "Cartel boss 'Chapo Isidro' captured", "Bloody firefight in Mexico leaves 11 dead"),
+            (54, "Pride takes over Copacabana", "Colourful costumes and dancing fill Rio beach"),
         ]),
-        ("AMERICAS & SPORT", [
-            (33, "US jails Nikhil Gupta: 235 months", "Murder-for-hire plot sentence handed down"),
-            (34, "Bolsonaro in ICU in Brazil", "Ex-president admitted with bowel obstruction"),
-            (35, "US airlines warned of terror threat", "Alert ahead of Thanksgiving travel surge"),
-            (36, "ATP final today: Alcaraz v Zverev", "Turin title decider; Zverev seeks third crown"),
+        ("SPORT & CULTURE", [
+            (55, "Liverpool rout United 4-0", "Yoro sent off after eight minutes at Anfield"),
+            (56, "Leeds stun Chelsea 4-1", "Arsenal draw 2-2; City held 1-1 by Fulham"),
+            (57, "Miley Cyrus marries in Palm Springs", "Pop star weds drummer Maxx Morando"),
         ]),
     ],
 ]
 
 STAT_BOXES = [
-    ("COP31 VOTE", "06:00 GMT", NAVY),
-    ("BAHRAIN", "0 injured", CRIMSON),
-    ("GAZA TENTS", "150,000", CRIMSON),
-    ("SPARTA II", "16 safe", LEAF),
-    ("EBOLA TOLL", "5,300+", CRIMSON),
-    ("ATP FINAL", "Turin", NAVY),
+    ("COP31", "COLLAPSED", CRIMSON),
+    ("DEMS 258", "HOUSE", NAVY),
+    ("HORMUZ", "2 TANKERS", CRIMSON),
+    ("BENGHAZI", "SHIP HIT", NAVY),
+    ("LIVERPOOL", "4-0", LEAF),
+    ("NASDAQ", "-5.28%", CRIMSON),
 ]
-
-LEAD_PORTRAITS = [
-    (735, (40, 40, 40), CRIMSON, "KURUM", "COP31 president"),
-    (835, (205, 205, 205), BLUE_TIE, "EISENKOT", "Israel's PM-designate"),
-    (935, (245, 215, 110), CRIMSON, "TRUMP", "US President"),
-]
-
 
 class FrontPage:
     """Owns the canvas and draws every section of the front page."""
@@ -258,118 +275,98 @@ class FrontPage:
         d.rectangle([MARGIN, 114, RIGHT_EDGE, 154], fill=NAVY)
         d.text((MARGIN + 20, 124), "SUNDAY • 22 NOVEMBER 2026",
                font=bold(20), fill=WHITE)
-        self.right(RIGHT_EDGE - 20, 128, "36 STORIES • 9 REGIONS",
+        self.right(RIGHT_EDGE - 20, 128, "57 STORIES • 9 REGIONS",
                    bold(16), GOLD)
 
     def stats(self):
         d = self.d
-        cell_w, cell_gap = 155, 7
-        for i, (label, value, color) in enumerate(STAT_BOXES):
-            bx = MARGIN + i * (cell_w + cell_gap)
-            d.rectangle([bx, 160, bx + cell_w, 206],
-                        fill=WHITE, outline=RULE)
-            self.center(bx + cell_w // 2, 165, label, plain(11), MUTED)
-            self.center(bx + cell_w // 2, 182, value, bold(20), color)
-        d.line([(MARGIN, 212), (RIGHT_EDGE, 212)], fill=CRIMSON, width=3)
+        parts = ["%s: %s" % (label, value) for label, value, _ in STAT_BOXES]
+        line = "  •  ".join(parts)
+        self.center(PAGE_W // 2, 162, line, bold(12), INK)
+        d.line([(MARGIN, 182), (RIGHT_EDGE, 182)], fill=RULE, width=1)
 
     def hero(self):
         d = self.d
-        d.rectangle([MARGIN, 218, RIGHT_EDGE, 414], fill=NAVY)
-        d.text((MARGIN + 20, 230), "CLIMATE & CONFLICT — THE LEAD STORY",
+        d.rectangle([MARGIN, 188, RIGHT_EDGE, 308], fill=NAVY)
+        d.text((MARGIN + 20, 198), "CLIMATE & CONFLICT — THE LEAD STORY",
                font=bold(13), fill=GOLD)
-        d.text((MARGIN + 20, 250), "COP31 NEARS A DEAL —",
-               font=serif(38), fill=WHITE)
-        d.text((MARGIN + 20, 292), "AS IRAN HITS BAHRAIN",
-               font=serif(38), fill=WHITE)
-        d.text((MARGIN + 20, 340),
-               "Antalya's overtime talks put a new package to 200 nations —",
-               font=plain(15), fill=WHITE)
-        d.text((MARGIN + 20, 360),
-               "hours after Iranian missiles set a Bahraini plant ablaze.",
-               font=plain(15), fill=WHITE)
-        first = "COP31 VOTE: 06:00 GMT  •  "
-        w1 = d.textlength(first, font=bold(12))
-        d.text((MARGIN + 20, 388), first, font=bold(12), fill=CRIMSON_LIGHT)
-        d.text((MARGIN + 20 + w1, 388), "BAHRAIN: FIRE, NO INJURIES",
-               font=bold(12), fill=GOLD)
-        for cx, hair, tie, name, title in LEAD_PORTRAITS:
-            self.portrait(cx, 238, hair, tie, name, title)
+        d.text((MARGIN + 20, 216), "COP31 COLLAPSES —",
+               font=serif(32), fill=WHITE)
+        d.text((MARGIN + 20, 250), "AS DRONES HIT A WARSHIP",
+               font=serif(32), fill=WHITE)
+        d.text((MARGIN + 20, 284),
+               "Antalya's talks end with no deal after a fossil-fuel fight — hours after sea drones hit a Russian ship.",
+               font=plain(13), fill=WHITE)
 
     def features(self):
         d = self.d
-        feat_y, feat_h = 420, 172
+        feat_y, feat_h = 314, 110
         for fx in COLUMN_X:
             d.rectangle([fx, feat_y, fx + COLUMN_W, feat_y + feat_h],
                         fill=WHITE, outline=RULE)
         specs = [
-            (COLUMN_X[0], "GULF • ATTACK", "Iran's missiles hit Bahrain",
-             self.flame, 496,
-             "An industrial site burns; defences intercept the rest."),
-            (COLUMN_X[1], "ISRAEL • NEW GOVERNMENT",
-             "Eisenkot tasked to govern", self.ballot, 512,
-             "Herzog picks the ex-army chief over Netanyahu."),
-            (COLUMN_X[2], "SPORT • TURIN", "Alcaraz v Zverev for the title",
-             self.tennis, 500,
-             "ATP Finals decider today; Zverev chases a third crown."),
+            (COLUMN_X[0], "MIDDLE EAST • HORMUZ",
+             "Two tankers hit mines near Hormuz",
+             "Bahrain reports an attack on a Sitra plant; Iran vows to counter a US blockade."),
+            (COLUMN_X[1], "WASHINGTON • MIDTERMS",
+             "Democrats clinch 258 House seats",
+             "Largest House majority since 1992; Hubbard wins the NC recount."),
+            (COLUMN_X[2], "SPORT • MANCHESTER",
+             "Liverpool rout United 4-0",
+             "Yoro sent off after eight minutes at Anfield; Leeds stun Chelsea 4-1."),
         ]
-        for fx, kicker, headline, icon, icon_y, caption in specs:
-            d.text((fx + 14, 430), kicker, font=bold(12), fill=CRIMSON)
-            self.para(fx + 14, 448, headline, serif(19), COLUMN_W - 28,
-                      22, INK)
-            icon(fx + COLUMN_W // 2, icon_y)
-            self.para(fx + 14, 566, caption, plain(12), COLUMN_W - 28,
-                      15, MUTED_DARK)
+        for fx, kicker, headline, caption in specs:
+            d.text((fx + 14, feat_y + 10), kicker, font=bold(12), fill=CRIMSON)
+            self.para(fx + 14, feat_y + 28, headline, serif(18),
+                      COLUMN_W - 28, 21, INK)
+            self.para(fx + 14, feat_y + 78, caption, plain(11),
+                      COLUMN_W - 28, 14, MUTED_DARK)
 
     def stories_heading(self):
         d = self.d
-        d.text((MARGIN, 600), "THE DAY IN 36 STORIES",
+        d.text((MARGIN, 432), "THE DAY IN 57 STORIES",
                font=serif(22), fill=INK)
         check_font = bold(13)
         part_a = "DATE CHECK: "
-        part_b = "ALL 36 STORIES DATED 22 NOV 2026"
+        part_b = "ALL 57 STORIES DATED 22 NOV 2026"
         wa = d.textlength(part_a, font=check_font)
         wb = d.textlength(part_b, font=check_font)
         box_w = 12 + 26 + 8 + wa + wb + 12
         box_x0 = RIGHT_EDGE - box_w
-        d.rectangle([box_x0, 596, RIGHT_EDGE, 626],
+        d.rectangle([box_x0, 428, RIGHT_EDGE, 458],
                     fill=WHITE, outline=GOLD, width=2)
         tick_x = box_x0 + 12
-        tick_y = 611
+        tick_y = 443
         d.line([(tick_x, tick_y), (tick_x + 7, tick_y + 7),
                 (tick_x + 20, tick_y - 8)], fill=CRIMSON, width=3)
         tx = box_x0 + 12 + 26 + 8
-        d.text((tx, 604), part_a, font=check_font, fill=CRIMSON)
-        d.text((tx + wa, 604), part_b, font=check_font, fill=INK)
-        d.line([(MARGIN, 630), (RIGHT_EDGE, 630)], fill=INK, width=2)
+        d.text((tx, 436), part_a, font=check_font, fill=CRIMSON)
+        d.text((tx + wa, 436), part_b, font=check_font, fill=INK)
+        d.line([(MARGIN, 464), (RIGHT_EDGE, 464)], fill=INK, width=2)
 
     def story_columns(self):
         d = self.d
-        num_font = bold(12)
-        head_font = bold(12)
-        det_font = plain(10)
+        num_font = bold(10)
+        head_font = bold(10)
+        det_font = plain(8)
         for col_i, groups in enumerate(STORY_COLUMNS):
             x = COLUMN_X[col_i]
-            y = 640
+            y = 468
             for region, stories in groups:
                 d.text((x, y), region, font=bold(13), fill=CRIMSON)
-                y += 16
+                y += 15
                 for number, headline, detail in stories:
                     d.text((x, y), "%02d" % number, font=num_font, fill=INK)
-                    for j, line in enumerate(self.fit(headline, head_font,
-                                                      COLUMN_W - 22)):
-                        d.text((x + 22, y + j * 13), line,
-                               font=head_font, fill=INK)
-                    for j, line in enumerate(self.fit(detail, det_font,
-                                                      COLUMN_W - 22)):
-                        d.text((x + 22, y + 11 + j * 12), line,
-                               font=det_font, fill=MUTED_DARK)
-                    y += 22
+                    d.text((x + 22, y), headline, font=head_font, fill=INK)
+                    d.text((x + 22, y + 13), detail, font=det_font,
+                           fill=MUTED_DARK)
+                    y += 23
 
     def sport_and_footer(self):
         d = self.d
         d.line([(MARGIN, 968), (RIGHT_EDGE, 968)], fill=RULE, width=1)
         d.text((MARGIN, 974),
-               "SPORT IN BRIEF: Bournemouth beat Forest • France reach rugby final v South Africa • Australia beat Wales",
+               "SPORT IN BRIEF: Liverpool 4-0 Man Utd • Leeds 4-1 Chelsea • Arsenal 2-2 Newcastle • Man City 1-1 Fulham • Real Madrid 2-1 Celta • Roma 5-1 Parma • PSG 3-2 Nice",
                font=plain(11), fill=MUTED_DARK)
         self.center(PAGE_W // 2, 1000,
                     "THE WORLD TODAY • SUNDAY 22 NOVEMBER 2026 • Sources: Reuters, AP, Al Jazeera, AFP, UN",

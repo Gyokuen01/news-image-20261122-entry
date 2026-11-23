@@ -1,12 +1,19 @@
 # news-image-20261122 — The World Today, Sunday 22 November 2026
 
 A newspaper front page summing up the world's news of Sunday 22
-November 2026 in one 1024x1024 image: COP31's overtime deal in
-Antalya, Iran's missile-and-drone attack on Bahrain, Israel's
-Eisenkot tasked to form a government, Gaza aid blocked at the border,
-a drone-hit Russian ship drifting into Finnish waters, and the ATP
-Finals decider in Turin — plus a numbered list of all 36 dated
+November 2026 in one 1024x1024 image: COP31's collapse in Antalya,
+sea drones striking a Russian warship at Benghazi, two tankers hit by
+mines off Hormuz, Democrats clinching 258 House seats, and Liverpool
+routing Manchester United 4-0 — plus a numbered list of all 57 dated
 stories across 9 regions, with a DATE CHECK box.
+
+v3 changes vs v2: 57 stories (was 36) in a denser digest — smaller
+digest type (bold 11 / plain 9), a slimmer hero without portraits and
+text-only feature boxes to make room; the lead is now the COP31
+collapse (verified against CNN and Le Monde reporting of 22 Nov),
+with the Benghazi drone strike as the second lead; stats strip,
+features and sport line all refreshed to the 22 Nov outcomes. Same
+masthead, date band and DATE CHECK box.
 
 v2 changes vs v1: the story list is regrouped into 9 visible regions
 (was 3 headers claiming 7); the heading now reads "THE DAY IN 36
@@ -30,7 +37,7 @@ mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 
 ## Sources
 
-Reuters, AP, Al Jazeera, AFP, UN — all stories verified against
+Reuters, AP, CNN, Le Monde, Al Jazeera, AFP, UN — all stories verified against
 reporting published on 22 November 2026. Events from earlier days
 (Voyager-1's 18 Nov milestone, the 20 Nov Virginia measles death,
 Nvidia's 12 Nov CEO resignation, Norway's 13 Nov oil ruling) were

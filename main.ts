@@ -1,8 +1,9 @@
 // main.ts — entrypoint for news-image-20261122 (Node 22, stdlib only).
 //
-// compose.py draws the front page and commits it as entry.png next to
-// this file. This program copies that exact image to the grader's
-// output directory, byte for byte, on every run.
+// compose.py draws the v3 front page (57 stories, all dated Sunday
+// 22 November 2026) and commits it as entry.png next to this file.
+// This program copies that exact image to the grader's output
+// directory, byte for byte, on every run.
 //
 // The grader runs `node /bot/main.ts` with the repository read-only at
 // /bot and a writable /output (MAKEFUN_OUTPUT_DIR). Writing back into
