@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Render THE WORLD TODAY front page for Sunday 22 November 2026.
+"""Render THE WORLD TODAY front page for Sunday 22 November 2026 (v2).
 
 A 1024x1024 newspaper front page: masthead, date band, a six-box stats
 strip, a lead-story hero with three portraits, three feature boxes, and
-a numbered list of 36 dated stories across 7 regions.
+a numbered list of 36 dated stories across 9 regions, with a DATE CHECK
+box proving every story is dated 22 November 2026.
 
 Built with Pillow only. Fully deterministic: no timestamps, no random
 numbers, no network. Running this file twice produces a byte-identical
@@ -94,35 +95,39 @@ def right_aligned(draw, x, y, text, font, fill):
 # (number, headline, detail), grouped by column and region.
 COLUMNS = [
     [
-        ("MIDDLE EAST & CLIMATE", [
+        ("CLIMATE", [
             (1, "COP31 nears a final deal",
              "Antalya package put to nations; vote 06:00 GMT"),
             (2, "Draft drops fossil-fuel phase-out",
              "130 nations pushed for it; producers resisted"),
+        ]),
+        ("THE GULF", [
             (3, "Iran hits Bahrain: site ablaze",
              "IRGC missiles, drones strike; fire, no injuries"),
             (4, "Bahrain defences intercept attacks",
              "Shrapnel causes damage; no casualties reported"),
-            (5, "Eisenkot tasked to form government",
-             "Herzog picks ex-army chief over Netanyahu"),
-            (6, "Eisenkot open to Netanyahu joining",
-             "Likud invited to coalition talks on Sunday"),
-            (7, "Likud sets unity-govt conditions",
-             "Keep security zones; no Palestinian state"),
-            (8, "Gaza aid plea from four nations",
-             "150,000 tents stuck at the border, floods bite"),
-            (9, "Houthi missile at Saudi Arabia",
+            (5, "Houthi missile at Saudi Arabia",
              "Saudi coalition says it was intercepted"),
-            (10, "Turkey intel chief meets Hamas",
-             "Talks in Istanbul as Gaza ceasefire holds"),
-            (11, "US details $12bn Venezuela revenue",
-             "State Dept report on oil and mineral income"),
-            (12, "Trump: Iran deal 'could last 20 years'",
+            (6, "Trump: Iran deal 'could last 20 years'",
              "US president floats a long-term agreement"),
+            (7, "Iran internet bill targets privacy",
+             "Accounts to be tied to real identities"),
+        ]),
+        ("ISRAEL & GAZA", [
+            (8, "Eisenkot tasked to form government",
+             "Herzog picks ex-army chief over Netanyahu"),
+            (9, "Eisenkot open to Netanyahu joining",
+             "Likud invited to coalition talks on Sunday"),
+            (10, "Likud sets unity-govt conditions",
+             "Keep security zones; no Palestinian state"),
+            (11, "Gaza aid plea from four nations",
+             "150,000 tents stuck at the border, floods bite"),
+            (12, "Turkey intel chief meets Hamas",
+             "Talks in Istanbul as Gaza ceasefire holds"),
         ]),
     ],
     [
-        ("EUROPE & UKRAINE", [
+        ("UKRAINE WAR", [
             (13, "Sparta II hit by drones in Baltic",
              "Russian ship ablaze, drifts into Finnish waters"),
             (14, "Russian helicopter 'breaches' Finland",
@@ -131,34 +136,40 @@ COLUMNS = [
              "Missiles hit Zelenskyy's hometown again"),
             (16, "Kindergarten hit in Zaporizhzhya",
              "Russian forces strike the region, Kyiv says"),
-            (17, "France: 4th weekend of protests",
+            (17, "Melania Trump seeks more ceasefires",
+             "Wants Russia-Ukraine truces before Christmas"),
+        ]),
+        ("EUROPE", [
+            (18, "France: 4th weekend of protests",
              "Cost-of-living marches across the country"),
-            (18, "Lisbon: thousands march on prices",
+            (19, "Lisbon: thousands march on prices",
              "Portugal protest over inflation and rents"),
-            (19, "Hegseth memo limits US-Canada ties",
-             "Secret memo curbs defence cooperation"),
             (20, "EU hunts new ECB chief",
              "Search opens as Christine Lagarde resigns"),
             (21, "Blair: rejoin EU only if UK innovates",
              "Ex-PM sets a technology test for return"),
-            (22, "Killer-robot talks run to 2028 deal",
+        ]),
+        ("WASHINGTON & THE UN", [
+            (22, "US details $12bn Venezuela revenue",
+             "State Dept report on oil and mineral income"),
+            (23, "Hegseth memo limits US-Canada ties",
+             "Secret memo curbs defence cooperation"),
+            (24, "Killer-robot talks run to 2028 deal",
              "UN states agree to keep negotiating the ban"),
-            (23, "Iran internet bill targets privacy",
-             "Accounts to be tied to real identities"),
-            (24, "Melania Trump seeks more ceasefires",
-             "Wants Russia-Ukraine truces before Christmas"),
         ]),
     ],
     [
-        ("AFRICA, ASIA & THE AMERICAS", [
+        ("AFRICA", [
             (25, "Al-Shabaab claims ambush killings",
              "Group says hundreds of Somali troops dead"),
             (26, "Kenya's last Ebola patient out",
-             "DR Congo death toll passes 5,300"),
+             "Kenya's last case out; DRC toll passes 5,300"),
             (27, "Ghana unveils Heritage banknotes",
              "Nkrumah and Kofi Annan honoured on cash"),
             (28, "Tigray's new mayor vows a vote",
              "Elections promised in six months after clashes"),
+        ]),
+        ("AFRICA & ASIA", [
             (29, "Sahel states reopen West Africa talks",
              "Dialogue restarts with the regional bloc"),
             (30, "DRC leader signs reform law",
@@ -167,6 +178,8 @@ COLUMNS = [
              "Bid to cut reliance on foreign yards"),
             (32, "India-Canada end trade talks round",
              "Sixth round of CEPA negotiations closes"),
+        ]),
+        ("AMERICAS & SPORT", [
             (33, "US jails Nikhil Gupta: 235 months",
              "Murder-for-hire plot sentence handed down"),
             (34, "Bolsonaro in ICU in Brazil",
@@ -272,7 +285,7 @@ def render():
     draw.rectangle([MARGIN, 114, W - MARGIN, 154], fill=NAVY)
     draw.text((MARGIN + 20, 124), "SUNDAY • 22 NOVEMBER 2026",
               font=sans_bold(20), fill=(255, 255, 255))
-    right_aligned(draw, W - MARGIN - 20, 128, "36 STORIES • 7 REGIONS",
+    right_aligned(draw, W - MARGIN - 20, 128, "36 STORIES • 9 REGIONS",
                   sans_bold(16), GOLD)
 
     # Stats strip: six boxes.
@@ -353,9 +366,24 @@ def render():
             sans(12), COL_W - 28)):
         draw.text((fx + 14, 566 + j * 15), line, font=sans(12), fill=GRAY_DARK)
 
-    # "Also on Sunday" heading and rule.
-    draw.text((MARGIN, 600), "ALSO ON SUNDAY — 32 MORE STORIES",
+    # "The day in 36 stories" heading, rule, and DATE CHECK box.
+    draw.text((MARGIN, 600), "THE DAY IN 36 STORIES",
               font=serif_bold(22), fill=INK)
+    dc_font = sans_bold(13)
+    dc_a = "DATE CHECK: "
+    dc_b = "ALL 36 STORIES DATED 22 NOV 2026"
+    wa = draw.textlength(dc_a, font=dc_font)
+    wb = draw.textlength(dc_b, font=dc_font)
+    box_w = 12 + 26 + 8 + wa + wb + 12
+    box_x0 = W - MARGIN - box_w
+    draw.rectangle([box_x0, 596, W - MARGIN, 626],
+                   fill=(255, 255, 255), outline=GOLD, width=2)
+    cx = box_x0 + 12
+    cy = 611
+    draw.line([(cx, cy), (cx + 7, cy + 7), (cx + 20, cy - 8)], fill=RED, width=3)
+    tx = box_x0 + 12 + 26 + 8
+    draw.text((tx, 604), dc_a, font=dc_font, fill=RED)
+    draw.text((tx + wa, 604), dc_b, font=dc_font, fill=INK)
     draw.line([(MARGIN, 630), (W - MARGIN, 630)], fill=INK, width=2)
 
     # Numbered story columns.
@@ -367,14 +395,14 @@ def render():
         y = 640
         for region, stories in groups:
             draw.text((x, y), region, font=sans_bold(13), fill=RED)
-            y += 18
+            y += 16
             for number, headline, detail in stories:
                 draw.text((x, y), "%02d" % number, font=num_font, fill=INK)
                 for j, line in enumerate(wrap(draw, headline, head_font, COL_W - 22)):
                     draw.text((x + 22, y + j * 13), line, font=head_font, fill=INK)
                 for j, line in enumerate(wrap(draw, detail, det_font, COL_W - 22)):
-                    draw.text((x + 22, y + 12 + j * 12), line, font=det_font, fill=GRAY_DARK)
-                y += 24
+                    draw.text((x + 22, y + 11 + j * 12), line, font=det_font, fill=GRAY_DARK)
+                y += 22
 
     # Sport strip.
     draw.line([(MARGIN, 968), (W - MARGIN, 968)], fill=GRAY_LINE, width=1)

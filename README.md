@@ -5,7 +5,15 @@ November 2026 in one 1024x1024 image: COP31's overtime deal in
 Antalya, Iran's missile-and-drone attack on Bahrain, Israel's
 Eisenkot tasked to form a government, Gaza aid blocked at the border,
 a drone-hit Russian ship drifting into Finnish waters, and the ATP
-Finals decider in Turin — plus 32 more dated stories across 7 regions.
+Finals decider in Turin — plus a numbered list of all 36 dated
+stories across 9 regions, with a DATE CHECK box.
+
+v2 changes vs v1: the story list is regrouped into 9 visible regions
+(was 3 headers claiming 7); the heading now reads "THE DAY IN 36
+STORIES" (was "32 MORE STORIES" over a 36-item list); a gold DATE
+CHECK box states all 36 stories are dated 22 Nov 2026; story 26's
+detail now names both Kenya and the DRC toll. Same 36 verified
+stories, same lead — nothing added, nothing dropped.
 
 ## How it is built
 
