@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
-"""THE WORLD TODAY front page, Sunday 22 November 2026 (v3).
+"""THE WORLD TODAY front page, Sunday 22 November 2026 (v4).
 
 This program paints a 1024x1024 newspaper front page and writes it to
 entry.png: a masthead, a navy date band, a one-line statistics strip, a
 hero lead about the COP31 collapse in Antalya and the Benghazi drone
-strike, three feature boxes, and a numbered digest of 57 stories from
+strike with a large photo, three feature boxes each topped by a photo,
+a four-photo strip, and a numbered digest of 57 stories from
 22 November 2026 sorted into 9 regions, closed by a DATE CHECK box
-that states every story on the page is dated that day.
+that states every story on the page is dated that day. Eight photos
+in total, all generated editorial-style pictures stored in photos/.
 
-Only Pillow is used. The picture is fully deterministic: the program reads
-no clock, no random source and no network, so two runs write the same
-bytes. The layout is driven by one FrontPage object that owns the canvas,
-the palette and the fonts; each section of the page is one method.
+Only Pillow is used. The picture is fully deterministic: the program
+reads no clock, no random source and no network, and the photos are
+fixed files, so two runs write the same bytes. The layout is driven by
+one FrontPage object that owns the canvas, the palette and the fonts;
+each section of the page is one method. The page is packed tight on
+purpose: section gaps are 6 pixels and the digest runs at a 21-pixel
+pitch so photos and all 57 stories fit on one page.
 """
 
 import os
@@ -29,20 +34,23 @@ LEAF = (34, 139, 34)
 MUTED = (110, 110, 105)
 MUTED_DARK = (70, 70, 68)
 RULE = (180, 175, 165)
-SKIN_TONE = (240, 200, 160)
 WHITE = (255, 255, 255)
-SUIT = (24, 24, 30)
-SHIRT = (245, 245, 245)
-FAINT = (180, 180, 180)
-SKIN_LINE = (200, 160, 120)
-TENNIS_BALL = (200, 220, 60)
-BLUE_TIE = (40, 80, 160)
 MARGIN = 28
 COLUMN_W = 309
 COLUMN_GAP = 20
 COLUMN_X = [MARGIN, MARGIN + COLUMN_W + COLUMN_GAP,
             MARGIN + 2 * (COLUMN_W + COLUMN_GAP)]
 RIGHT_EDGE = PAGE_W - MARGIN
+PHOTO_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                         "photos")
+# Digest geometry (v4): 21 px pitch, detail line 11 px below the
+# headline, region header step 14 px. At these sizes the headline
+# (bold 10) and the detail (plain 8) keep a 2 px gap, the same gap
+# v3 had at pitch 23.
+DIGEST_TOP = 506
+DIGEST_PITCH = 21
+DIGEST_DETAIL = 11
+DIGEST_HEADER_STEP = 14
 
 FONT_FOLDERS = [
     "/usr/share/fonts/truetype/liberation",
@@ -205,127 +213,117 @@ class FrontPage:
         for i, line in enumerate(self.fit(text, font, width)):
             self.d.text((x, y + i * step), line, font=font, fill=fill)
 
-    # -- small pictures --------------------------------------------------
-    def portrait(self, cx, top, hair, tie, name, title):
-        """A cartoon leader: suit, shirt, tie, head, hair and two eyes."""
-        d = self.d
-        suit = [(cx - 38, top + 110), (cx + 38, top + 110),
-                (cx + 30, top + 60), (cx - 30, top + 60)]
-        d.polygon(suit, fill=SUIT)
-        shirt = [(cx - 10, top + 60), (cx + 10, top + 60), (cx, top + 80)]
-        d.polygon(shirt, fill=SHIRT)
-        tie_shape = [(cx - 5, top + 64), (cx + 5, top + 64),
-                     (cx + 4, top + 90), (cx, top + 96), (cx - 4, top + 90)]
-        d.polygon(tie_shape, fill=tie)
-        d.ellipse([cx - 27, top, cx + 27, top + 54],
-                  fill=SKIN_TONE, outline=SKIN_LINE)
-        d.pieslice([cx - 27, top - 4, cx + 27, top + 26], 180, 360, fill=hair)
-        d.ellipse([cx - 14, top + 24, cx - 8, top + 28], fill=INK)
-        d.ellipse([cx + 8, top + 24, cx + 14, top + 28], fill=INK)
-        self.center(cx, top + 116, name, bold(14), WHITE)
-        self.center(cx, top + 134, title, plain(10), FAINT)
+    # -- photos -----------------------------------------------------------
+    def photo(self, name, x, y, w, h):
+        """Paste a photo from photos/ into a box, center-cropped to fit."""
+        path = os.path.join(PHOTO_DIR, name)
+        pic = Image.open(path).convert("RGB")
+        tw, th = pic.size
+        target = w / h
+        have = tw / th
+        if have > target:
+            cut = int(th * target)
+            left = (tw - cut) // 2
+            pic = pic.crop((left, 0, left + cut, th))
+        else:
+            cut = int(tw / target)
+            top = (th - cut) // 2
+            pic = pic.crop((0, top, tw, top + cut))
+        pic = pic.resize((w, h), Image.LANCZOS)
+        self.img.paste(pic, (x, y))
 
-    def flame(self, cx, top):
-        """A flame over a dark base line, for the Bahrain feature."""
-        d = self.d
-        outer = [(cx, top), (cx + 26, top + 34), (cx + 12, top + 30),
-                 (cx + 20, top + 52), (cx, top + 44), (cx - 20, top + 52),
-                 (cx - 12, top + 30), (cx - 26, top + 34)]
-        d.polygon(outer, fill=CRIMSON)
-        inner = [(cx, top + 22), (cx + 12, top + 44),
-                 (cx, top + 52), (cx - 12, top + 44)]
-        d.polygon(inner, fill=GOLD)
-        d.rectangle([cx - 30, top + 56, cx + 30, top + 62], fill=INK)
-
-    def ballot(self, cx, top):
-        """A ballot box with a red tick, for the Israel feature."""
-        d = self.d
-        d.rectangle([cx - 34, top + 8, cx + 34, top + 52], fill=NAVY)
-        d.rectangle([cx - 40, top, cx + 40, top + 10], fill=INK)
-        d.rectangle([cx - 10, top + 2, cx + 10, top + 8], fill=PAPER)
-        d.rectangle([cx - 22, top - 26, cx + 22, top - 4],
-                    outline=CRIMSON, width=3)
-        d.line([(cx - 16, top - 15), (cx - 4, top - 6),
-                (cx + 16, top - 24)], fill=CRIMSON, width=3)
-
-    def tennis(self, cx, top):
-        """A tennis ball, for the sport feature."""
-        d = self.d
-        d.ellipse([cx - 30, top, cx + 30, top + 60], fill=TENNIS_BALL,
-                  outline=INK, width=2)
-        d.arc([cx - 30, top + 4, cx - 2, top + 56], 270, 90,
-              fill=WHITE, width=4)
-        d.arc([cx + 2, top + 4, cx + 30, top + 56], 90, 270,
-              fill=WHITE, width=4)
+    def photo_caption(self, x, y, w, text):
+        """A navy caption strip with white text, laid over a photo."""
+        self.d.rectangle([x, y, x + w, y + 16], fill=NAVY)
+        self.d.text((x + 8, y + 3), text, font=plain(9), fill=WHITE)
 
     # -- page sections ----------------------------------------------------
     def top_rule(self):
         d = self.d
         d.text((MARGIN, 8), "VOL. 2026 — No. 326", font=plain(11), fill=MUTED)
         self.right(RIGHT_EDGE, 8, "PRICE: ONE DAY'S NEWS", plain(11), MUTED)
-        d.line([(MARGIN, 28), (RIGHT_EDGE, 28)], fill=INK, width=1)
+        d.line([(MARGIN, 26), (RIGHT_EDGE, 26)], fill=INK, width=1)
 
     def masthead(self):
         d = self.d
-        self.center(PAGE_W // 2, 34, "THE WORLD TODAY", serif(72), INK)
-        d.line([(MARGIN, 108), (RIGHT_EDGE, 108)], fill=INK, width=2)
+        self.center(PAGE_W // 2, 30, "THE WORLD TODAY", serif(58), INK)
+        d.line([(MARGIN, 96), (RIGHT_EDGE, 96)], fill=INK, width=2)
 
     def date_band(self):
         d = self.d
-        d.rectangle([MARGIN, 114, RIGHT_EDGE, 154], fill=NAVY)
-        d.text((MARGIN + 20, 124), "SUNDAY • 22 NOVEMBER 2026",
-               font=bold(20), fill=WHITE)
-        self.right(RIGHT_EDGE - 20, 128, "57 STORIES • 9 REGIONS",
-                   bold(16), GOLD)
+        d.rectangle([MARGIN, 102, RIGHT_EDGE, 136], fill=NAVY)
+        d.text((MARGIN + 20, 110), "SUNDAY • 22 NOVEMBER 2026",
+               font=bold(19), fill=WHITE)
+        self.right(RIGHT_EDGE - 20, 112, "57 STORIES • 9 REGIONS",
+                   bold(15), GOLD)
 
     def stats(self):
         d = self.d
         parts = ["%s: %s" % (label, value) for label, value, _ in STAT_BOXES]
         line = "  •  ".join(parts)
-        self.center(PAGE_W // 2, 162, line, bold(12), INK)
-        d.line([(MARGIN, 182), (RIGHT_EDGE, 182)], fill=RULE, width=1)
+        self.center(PAGE_W // 2, 144, line, bold(11), INK)
+        d.line([(MARGIN, 160), (RIGHT_EDGE, 160)], fill=RULE, width=1)
 
     def hero(self):
         d = self.d
-        d.rectangle([MARGIN, 188, RIGHT_EDGE, 308], fill=NAVY)
-        d.text((MARGIN + 20, 198), "CLIMATE & CONFLICT — THE LEAD STORY",
-               font=bold(13), fill=GOLD)
-        d.text((MARGIN + 20, 216), "COP31 COLLAPSES —",
-               font=serif(32), fill=WHITE)
-        d.text((MARGIN + 20, 250), "AS DRONES HIT A WARSHIP",
-               font=serif(32), fill=WHITE)
-        d.text((MARGIN + 20, 284),
-               "Antalya's talks end with no deal after a fossil-fuel fight — hours after sea drones hit a Russian ship.",
-               font=plain(13), fill=WHITE)
+        d.rectangle([MARGIN, 166, RIGHT_EDGE, 274], fill=NAVY)
+        d.text((MARGIN + 20, 174), "CLIMATE & CONFLICT — THE LEAD STORY",
+               font=bold(12), fill=GOLD)
+        d.text((MARGIN + 20, 190), "COP31 COLLAPSES —",
+               font=serif(28), fill=WHITE)
+        d.text((MARGIN + 20, 220), "AS DRONES HIT A WARSHIP",
+               font=serif(28), fill=WHITE)
+        self.para(MARGIN + 20, 248,
+                  "Antalya's talks end with no deal after a fossil-fuel fight — hours after sea drones hit a Russian ship.",
+                  plain(11), 580, 14, WHITE)
+        self.photo("01-cop31.jpg", 640, 166, 356, 108)
+        self.photo_caption(640, 258, 356,
+                           "Delegates leave the Antalya talks with no deal")
 
     def features(self):
         d = self.d
-        feat_y, feat_h = 314, 110
-        for fx in COLUMN_X:
-            d.rectangle([fx, feat_y, fx + COLUMN_W, feat_y + feat_h],
-                        fill=WHITE, outline=RULE)
+        feat_y, feat_h = 280, 108
         specs = [
-            (COLUMN_X[0], "MIDDLE EAST • HORMUZ",
+            (COLUMN_X[0], "02-hormuz.jpg", "MIDDLE EAST • HORMUZ",
              "Two tankers hit mines near Hormuz",
-             "Bahrain reports an attack on a Sitra plant; Iran vows to counter a US blockade."),
-            (COLUMN_X[1], "WASHINGTON • MIDTERMS",
+             "Bahrain reports attack on Sitra plant"),
+            (COLUMN_X[1], "03-democrats.jpg", "WASHINGTON • MIDTERMS",
              "Democrats clinch 258 House seats",
-             "Largest House majority since 1992; Hubbard wins the NC recount."),
-            (COLUMN_X[2], "SPORT • MANCHESTER",
+             "Largest House majority since 1992"),
+            (COLUMN_X[2], "04-liverpool.jpg", "SPORT • MANCHESTER",
              "Liverpool rout United 4-0",
-             "Yoro sent off after eight minutes at Anfield; Leeds stun Chelsea 4-1."),
+             "Yoro sent off after eight minutes"),
         ]
-        for fx, kicker, headline, caption in specs:
-            d.text((fx + 14, feat_y + 10), kicker, font=bold(12), fill=CRIMSON)
-            self.para(fx + 14, feat_y + 28, headline, serif(18),
-                      COLUMN_W - 28, 21, INK)
-            self.para(fx + 14, feat_y + 78, caption, plain(11),
-                      COLUMN_W - 28, 14, MUTED_DARK)
+        for fx, photo_name, kicker, headline, caption in specs:
+            self.photo(photo_name, fx, feat_y, COLUMN_W, 52)
+            self.photo_caption(fx, feat_y + 36, COLUMN_W, caption)
+            d.rectangle([fx, feat_y, fx + COLUMN_W, feat_y + feat_h],
+                        outline=RULE)
+            d.text((fx + 14, feat_y + 58), kicker, font=bold(11),
+                   fill=CRIMSON)
+            self.para(fx + 14, feat_y + 72, headline, serif(16),
+                      COLUMN_W - 28, 18, INK)
+
+    def photo_strip(self):
+        d = self.d
+        strip_y, strip_h = 394, 54
+        strip_w = (RIGHT_EDGE - MARGIN - 3 * COLUMN_GAP) // 4
+        specs = [
+            ("05-benghazi.jpg", "04 · Benghazi warship hit"),
+            ("06-nigeria.jpg", "49 · Nigeria boat tragedy"),
+            ("07-riopride.jpg", "54 · Rio Pride takes over"),
+            ("08-wedding.jpg", "57 · Miley weds in Palm Springs"),
+        ]
+        for i, (photo_name, caption) in enumerate(specs):
+            x = MARGIN + i * (strip_w + COLUMN_GAP)
+            self.photo(photo_name, x, strip_y, strip_w, strip_h)
+            d.text((x, strip_y + strip_h + 4), caption, font=plain(9),
+                   fill=MUTED_DARK)
 
     def stories_heading(self):
         d = self.d
-        d.text((MARGIN, 432), "THE DAY IN 57 STORIES",
-               font=serif(22), fill=INK)
+        d.text((MARGIN, 472), "THE DAY IN 57 STORIES",
+               font=serif(20), fill=INK)
         check_font = bold(13)
         part_a = "DATE CHECK: "
         part_b = "ALL 57 STORIES DATED 22 NOV 2026"
@@ -333,16 +331,16 @@ class FrontPage:
         wb = d.textlength(part_b, font=check_font)
         box_w = 12 + 26 + 8 + wa + wb + 12
         box_x0 = RIGHT_EDGE - box_w
-        d.rectangle([box_x0, 428, RIGHT_EDGE, 458],
+        d.rectangle([box_x0, 468, RIGHT_EDGE, 494],
                     fill=WHITE, outline=GOLD, width=2)
         tick_x = box_x0 + 12
-        tick_y = 443
+        tick_y = 481
         d.line([(tick_x, tick_y), (tick_x + 7, tick_y + 7),
                 (tick_x + 20, tick_y - 8)], fill=CRIMSON, width=3)
         tx = box_x0 + 12 + 26 + 8
-        d.text((tx, 436), part_a, font=check_font, fill=CRIMSON)
-        d.text((tx + wa, 436), part_b, font=check_font, fill=INK)
-        d.line([(MARGIN, 464), (RIGHT_EDGE, 464)], fill=INK, width=2)
+        d.text((tx, 474), part_a, font=check_font, fill=CRIMSON)
+        d.text((tx + wa, 474), part_b, font=check_font, fill=INK)
+        d.line([(MARGIN, 500), (RIGHT_EDGE, 500)], fill=INK, width=2)
 
     def story_columns(self):
         d = self.d
@@ -351,24 +349,24 @@ class FrontPage:
         det_font = plain(8)
         for col_i, groups in enumerate(STORY_COLUMNS):
             x = COLUMN_X[col_i]
-            y = 468
+            y = DIGEST_TOP
             for region, stories in groups:
                 d.text((x, y), region, font=bold(13), fill=CRIMSON)
-                y += 15
+                y += DIGEST_HEADER_STEP
                 for number, headline, detail in stories:
                     d.text((x, y), "%02d" % number, font=num_font, fill=INK)
                     d.text((x + 22, y), headline, font=head_font, fill=INK)
-                    d.text((x + 22, y + 13), detail, font=det_font,
-                           fill=MUTED_DARK)
-                    y += 23
+                    d.text((x + 22, y + DIGEST_DETAIL), detail,
+                           font=det_font, fill=MUTED_DARK)
+                    y += DIGEST_PITCH
 
     def sport_and_footer(self):
         d = self.d
-        d.line([(MARGIN, 968), (RIGHT_EDGE, 968)], fill=RULE, width=1)
-        d.text((MARGIN, 974),
+        d.line([(MARGIN, 973), (RIGHT_EDGE, 973)], fill=RULE, width=1)
+        d.text((MARGIN, 979),
                "SPORT IN BRIEF: Liverpool 4-0 Man Utd • Leeds 4-1 Chelsea • Arsenal 2-2 Newcastle • Man City 1-1 Fulham • Real Madrid 2-1 Celta • Roma 5-1 Parma • PSG 3-2 Nice",
                font=plain(11), fill=MUTED_DARK)
-        self.center(PAGE_W // 2, 1000,
+        self.center(PAGE_W // 2, 1005,
                     "THE WORLD TODAY • SUNDAY 22 NOVEMBER 2026 • Sources: Reuters, AP, Al Jazeera, AFP, UN",
                     plain(11), MUTED)
 
@@ -379,6 +377,7 @@ class FrontPage:
         self.stats()
         self.hero()
         self.features()
+        self.photo_strip()
         self.stories_heading()
         self.story_columns()
         self.sport_and_footer()

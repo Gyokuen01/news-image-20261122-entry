@@ -7,6 +7,17 @@ mines off Hormuz, Democrats clinching 258 House seats, and Liverpool
 routing Manchester United 4-0 — plus a numbered list of all 57 dated
 stories across 9 regions, with a DATE CHECK box.
 
+v4 changes vs v3: 8 photos added — a large COP31 photo in the hero,
+one photo topping each of the three feature boxes (Hormuz tankers,
+Democrats 258 seats, Liverpool 4-0), and a four-photo strip (Benghazi
+warship, Nigeria boat tragedy, Rio Pride, Miley's Palm Springs
+wedding), each photo captioned and linked to its digest story number.
+The photos are generated editorial-style pictures in photos/, pasted
+in by compose.py. The page is packed tighter to fit them: masthead,
+date band and stats strip slimmed, digest at a 21 px pitch with 11 px
+detail offset, section gaps of 6 px. Still all 57 stories, 9 regions,
+same lead, same DATE CHECK box.
+
 v3 changes vs v2: 57 stories (was 36) in a denser digest — smaller
 digest type (bold 11 / plain 9), a slimmer hero without portraits and
 text-only feature boxes to make room; the lead is now the COP31
